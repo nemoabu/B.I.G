@@ -1,0 +1,39 @@
+/* Reset body styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #030303;
+  }
+  
+  /* Style the main container */
+  main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+  
+  /* Style the buttons */
+  button {
+    width: 200px;
+    height: 60px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
+    border: 3px solid #768677;
+    border-radius: 10px;
+    background-color: rgb(33, 21, 21);
+    color: #fbfbfb;
+    transition: all 0.3s ease;
+  }
+  
+  button:hover {
+    background-color: #fff6f6;
+    color: rgb(0, 0, 0);
+  }
+  
