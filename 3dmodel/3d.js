@@ -23,6 +23,8 @@ const mat = new THREE.MeshStandardMaterial({
     flatShading:true
 });
 const mesh = new THREE.Mesh(geo, mat);
+mesh.position.x = -0.5; // Shift left by 0.5 units
+
 
 scene.add(mesh);
 const wireMat =new THREE.MeshBasicMaterial({
@@ -34,6 +36,9 @@ wireMesh.scale.setScalar(1.001);
 mesh.add(wireMesh);
 const hemiLight = new THREE.HemisphereLight(0xffffff, 0x000000) 
 scene.add(hemiLight);
+
+controls.target.copy(mesh.position);
+
 function animate(t=0){
     requestAnimationFrame(animate);
     //mesh.rotation.y=t*0.0001;
