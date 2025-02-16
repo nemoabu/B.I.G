@@ -7,6 +7,7 @@ renderer.setSize(w,h);
 document.body.appendChild(renderer.domElement);
 
 
+const dragThreshold = 5;  
 const fov = 75;
 const aspect = w /h;
 const near = 0.1;
@@ -39,10 +40,72 @@ scene.add(hemiLight);
 
 controls.target.copy(mesh.position);
 
+// Add this below your existing code
+
+// Raycaster and mouse vector for detecting hover
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+let selectedObject = null;  // Track the object that is hovered over
+
+// Mouse move event listener
+function onMouseMove(event) {
+    // Normalize mouse coordinates to [-1, 1] range
+    mouse.x = (event.clientX / w) * 2 - 1;
+    mouse.y = -(event.clientY / h) * 2 + 1;
+}
+
+// Add the event listener for mouse move
+document.addEventListener('mousemove', onMouseMove);
+// Event listener for mouse click
+window.addEventListener('click', onMouseClick, false);
+
+function onMouseClick(event) {
+    // Update the mouse coordinates to normalized device coordinates (-1 to 1)
+    mouse.x = (event.clientX / w) * 2 - 1;
+    mouse.y = -(event.clientY / h) * 2 + 1;
+
+    // Update the raycaster with the current mouse position
+    raycaster.setFromCamera(mouse, camera);
+
+    // Get the objects intersected by the raycaster
+    const intersects = raycaster.intersectObjects(scene.children, true);
+    console.log('Intersects:', intersects);
+    console.log('Ray Direction:', raycaster.ray.direction);
+    // If the raycaster intersects the mesh
+    if (intersects.length > 0 ) {
+        // Redirect to a URL when the mesh is clicked
+
+        console.log("Redirecting to URL...");  // Debugging log
+        window.location.href = 'https://www.youtube.com/watch?v=QO92JBY9ZuE&list=RDfCeiUX59_FM&index=4';
+    }
+}
+
 function animate(t=0){
     requestAnimationFrame(animate);
+    raycaster.setFromCamera(mouse, camera);
+    const intersects = raycaster.intersectObjects(scene.children, true);
+
+    // Check if intersects has any elements, meaning an object was hit
+    if (intersects.length > 0) {
+        // Reset the previously highlighted object if any
+        if (selectedObject) {
+            selectedObject.material.color.set(0xffffff); // Reset color to original (white)
+        }
+
+        // Highlight the first intersected object
+        selectedObject = intersects[0].object;
+        selectedObject.material.color.set(0xffff00); // Set color to yellow
+    } else {
+        // If no intersection, reset the previous object (if any)
+        if (selectedObject) {
+            selectedObject.material.color.set(0xffffff); // Reset color to original (white)
+            selectedObject = null;
+        }
+    }
     //mesh.rotation.y=t*0.0001;
     renderer.render(scene, camera);
     controls.update();
 }
 animate();
+
+
