@@ -1,4 +1,106 @@
 import * as THREE from "three";
+import { OrbitControls } from "jsm/controls/OrbitControls.js";
+import { OBJLoader } from "jsm/loaders/OBJLoader.js"; // Import OBJLoader
+
+const w = window.innerWidth;
+const h = window.innerHeight;
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(w, h);
+document.body.appendChild(renderer.domElement);
+
+const fov = 75;
+const aspect = w / h;
+const near = 0.1;
+const far = 10;
+const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+camera.position.z = 2;
+const scene = new THREE.Scene();
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.03;
+
+const hemiLight = new THREE.HemisphereLight(0xffffff, 0x000000);
+scene.add(hemiLight);
+
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+let selectedObject = null;
+let humanModel = null; // Store the loaded model
+
+
+
+
+// Load Human OBJ Model
+const objLoader = new OBJLoader();
+objLoader.load(
+    "human2.obj", // Change this to the correct path
+    (object) => {
+        object.traverse((child) => {
+            if (child.isMesh) {
+                child.material = new THREE.MeshStandardMaterial({
+                    color: 0xffffff,
+                    flatShading: true
+                });
+            }
+        });
+
+        object.position.set(0, -1.2, 0);
+        object.scale.set(0.1, 0.1, 0.1);
+
+        scene.add(object);
+        humanModel = object; // Store reference for interaction
+    },
+    undefined,
+    (error) => console.error("Error loading model:", error)
+);
+
+function onMouseMove(event) {
+    mouse.x = (event.clientX / w) * 2 - 1;
+    mouse.y = -(event.clientY / h) * 2 + 1;
+}
+
+document.addEventListener("mousemove", onMouseMove);
+window.addEventListener("click", onMouseClick, false);
+
+function onMouseClick(event) {
+    mouse.x = (event.clientX / w) * 2 - 1;
+    mouse.y = -(event.clientY / h) * 2 + 1;
+    raycaster.setFromCamera(mouse, camera);
+
+    const intersects = raycaster.intersectObjects(scene.children, true);
+
+    if (intersects.length > 0) {
+        console.log("Redirecting to URL...");
+        window.location.href = "https://www.youtube.com/watch?v=QO92JBY9ZuE&list=RDfCeiUX59_FM&index=4";
+    }
+}
+
+function animate() {
+    requestAnimationFrame(animate);
+    raycaster.setFromCamera(mouse, camera);
+
+    const intersects = raycaster.intersectObjects(scene.children, true);
+    if (intersects.length > 0) {
+        if (selectedObject) selectedObject.material.color.set(0xffffff);
+        selectedObject = intersects[0].object;
+        selectedObject.material.color.set(0xffff00);
+    } else {
+        if (selectedObject) {
+            selectedObject.material.color.set(0xffffff);
+            selectedObject = null;
+        }
+    }
+
+    renderer.render(scene, camera);
+    controls.update();
+}
+
+animate();
+
+
+/*
+import * as THREE from "three";
 import {OrbitControls} from "jsm/controls/OrbitControls.js"
 const w = window.innerWidth;
 const h = window.innerHeight;
@@ -108,4 +210,4 @@ function animate(t=0){
 }
 animate();
 
-
+*/
